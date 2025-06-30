@@ -49,10 +49,12 @@ public class DescBlockParser {
         }
 
         // 4. HTTP Method and Path
-        Matcher methodMatcher = Pattern.compile("(post|get|put|delete)\\s+:([\\w_]+)").matcher(block);
+//        Matcher methodMatcher = Pattern.compile("(post|get|put|delete)\\s+:([\\w_]+)").matcher(block);
+        Matcher methodMatcher = Pattern.compile("(post|get|put|delete)\\s+[:'\"]?([\\w_]+)").matcher(block);
         if (methodMatcher.find()) {
+            String subPath = methodMatcher.group(2);
             metadata.httpMethod = methodMatcher.group(1).toUpperCase();
-            metadata.endpoint = fileBaseName + "/" + methodMatcher.group(2);
+            metadata.endpoint = fileBaseName + "/" + (subPath.equalsIgnoreCase("do") ? "" : subPath);
         }
 
         // 5. Southbound Version - Option A: Check 'before' tag
