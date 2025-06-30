@@ -1,3 +1,7 @@
+.idea/
+/target
+*.csv
+*.xlx
 # Compiled class file
 *.class
 
