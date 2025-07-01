@@ -34,8 +34,10 @@ public class Northbound {
     public static List<ApiMetadata> apiMetadata = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
-        Path rootDir = Paths.get("D:\\Work\\Abacus\\transformation\\input");
+        //Path rootDir = Paths.get("D:\\Work\\Abacus\\transformation\\input");
+        Path rootDir = Paths.get("C:\\Abacus projects\\Ruby-Code-Input");
 
+        //C:\Abacus projects\Ruby-Code-Input
         // Traverse both northbound and southbound
         traverseAndExtract(rootDir.resolve("northbound"));
 

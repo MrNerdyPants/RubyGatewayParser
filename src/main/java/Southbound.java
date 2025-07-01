@@ -41,7 +41,9 @@ public class Southbound {
     }
 
     public static void main(String[] args) throws IOException {
-        Path basePath = Paths.get("D:\\Work\\Abacus\\transformation\\input");
+       // Path basePath = Paths.get("D:\\Work\\Abacus\\transformation\\input");
+        Path basePath = Paths.get("C:\\Abacus projects\\Ruby-Code-Input");
+
         if (!Files.exists(basePath)) {
             System.err.println("Directory not found: " + basePath);
             return;
