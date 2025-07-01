@@ -112,33 +112,282 @@ public class DescBlockParser {
 //        return metadata;
 //    }
 
+
+
+    // Alternative method that processes line by line
     private static String buildJsonFromParams(String paramsBlock) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode();
 
-        Matcher paramMatcher = Pattern.compile("requires\\s+:([\\w_]+),\\s*type:\\s*(\\w+)", Pattern.DOTALL).matcher(paramsBlock);
-        while (paramMatcher.find()) {
-            String name = paramMatcher.group(1);
-            String type = paramMatcher.group(2);
+        String[] lines = paramsBlock.split("\\r?\\n");
+        System.out.println("=== LINE BY LINE PROCESSING ===");
+        System.out.println("Total lines: " + lines.length);
 
-            switch (type.toLowerCase()) {
-                case "string":
-                    root.put(name, "example");
-                    break;
-                case "boolean":
-                    root.put(name, true);
-                    break;
-                case "integer":
-                    root.put(name, 123);
-                    break;
-                case "float":
-                    root.put(name, 1.23);
-                    break;
-                default:
-                    root.put(name, "value");
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+            System.out.println("Line " + i + ": '" + line + "'");
+
+            if (line.isEmpty()) continue;
+
+            // Pattern for a single line
+            Pattern linePattern = Pattern.compile("(optional|requires)\\s+:([\\w_]+),\\s*type:\\s*(\\w+)");
+            Matcher lineMatcher = linePattern.matcher(line);
+
+            if (lineMatcher.find()) {
+                String name = lineMatcher.group(2);
+                String type = lineMatcher.group(3);
+
+                System.out.println("  -> Found: " + name + " (type: " + type + ")");
+
+                switch (type.toLowerCase()) {
+                    case "string":
+                        root.put(name, "example");
+                        break;
+                    case "boolean":
+                        root.put(name, true);
+                        break;
+                    case "integer":
+                        root.put(name, 123);
+                        break;
+                    case "float":
+                        root.put(name, 1.23);
+                        break;
+                    default:
+                        root.put(name, "value");
+                }
+            } else {
+                System.out.println("  -> No match found for this line");
             }
         }
 
         return root.toPrettyString();
     }
+
+
+//    private static String buildJsonFromParams(String paramsBlock) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ObjectNode root = mapper.createObjectNode();
+//
+//        // More flexible pattern that handles various whitespace and quote types
+//        Pattern pattern = Pattern.compile("(?:optional|requires)\\s*:\\s*([\\w_]+)\\s*,\\s*type\\s*:\\s*(\\w+)", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+//        Matcher matcher = pattern.matcher(paramsBlock);
+//
+//        while (matcher.find()) {
+//            String name = matcher.group(1);
+//            String type = matcher.group(2);
+//
+//            System.out.println("Found: " + name + " -> " + type);
+//
+//            switch (type.toLowerCase()) {
+//                case "string":
+//                    root.put(name, "example");
+//                    break;
+//                case "boolean":
+//                    root.put(name, true);
+//                    break;
+//                case "integer":
+//                    root.put(name, 123);
+//                    break;
+//                case "float":
+//                    root.put(name, 1.23);
+//                    break;
+//                default:
+//                    root.put(name, "value");
+//            }
+//        }
+//
+//        return root.toPrettyString();
+//    }
+
+//    private static String buildJsonFromParams(String paramsBlock) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ObjectNode root = mapper.createObjectNode();
+//
+//        // Updated pattern to handle the actual Ruby parameter format
+//        // This pattern captures: optional/requires :param_name, type: Type
+//        // and ignores everything after type: until the next line
+//        Pattern pattern = Pattern.compile("(optional|requires)\\s+:([\\w_]+),\\s*type:\\s*(\\w+)", Pattern.MULTILINE);
+//        Matcher matcher = pattern.matcher(paramsBlock);
+//
+//        while (matcher.find()) {
+//            String name = matcher.group(2);
+//            String type = matcher.group(3);
+//
+//            if(name.equalsIgnoreCase("marital_status")){
+//                System.out.println("Found marital_status");
+//            }
+//
+//            switch (type.toLowerCase()) {
+//                case "string":
+//                    root.put(name, "example");
+//                    break;
+//                case "boolean":
+//                    root.put(name, true);
+//                    break;
+//                case "integer":
+//                    root.put(name, 123);
+//                    break;
+//                case "float":
+//                    root.put(name, 1.23);
+//                    break;
+//                default:
+//                    root.put(name, "value");
+//            }
+//        }
+//
+//        return root.toPrettyString();
+//    }
+
+//    private static String buildJsonFromParams(String paramsBlock) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ObjectNode root = mapper.createObjectNode();
+//
+//        // This pattern matches both `optional` and `requires` with multi-line support
+//        Pattern pattern = Pattern.compile("(optional|requires)\\s+:([\\w_]+),\\s*type:\\s*(\\w+)", Pattern.MULTILINE);
+//        Matcher matcher = pattern.matcher(paramsBlock);
+//
+//        while (matcher.find()) {
+//            String name = matcher.group(2);
+//            String type = matcher.group(3);
+//
+//            if(name.equalsIgnoreCase("marital_status")){
+//////                name = "BAKA USER";
+//                System.out.println("ssdsd");
+//            }
+//
+//            switch (type.toLowerCase()) {
+//                case "string":
+//                    root.put(name, "example");
+//                    break;
+//                case "boolean":
+//                    root.put(name, true);
+//                    break;
+//                case "integer":
+//                    root.put(name, 123);
+//                    break;
+//                case "float":
+//                    root.put(name, 1.23);
+//                    break;
+//                default:
+//                    root.put(name, "value");
+//            }
+//        }
+//
+//        return root.toPrettyString();
+//    }
+
+
+
+//    private static String buildJsonFromParams(String paramsBlock) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ObjectNode root = mapper.createObjectNode();
+//
+//        // Match both 'requires' and 'optional' with flexible spacing and line breaks
+//        Matcher paramMatcher = Pattern.compile(
+//                "(requires|optional)\\s+:([\\w_]+),\\s*type:\\s*(\\w+)",
+//                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+//        ).matcher(paramsBlock);
+//
+//        while (paramMatcher.find()) {
+//            String name = paramMatcher.group(2);
+//            String type = paramMatcher.group(3);
+//
+//            switch (type.toLowerCase()) {
+//                case "string":
+//                    root.put(name, "example");
+//                    break;
+//                case "boolean":
+//                    root.put(name, true);
+//                    break;
+//                case "integer":
+//                    root.put(name, 123);
+//                    break;
+//                case "float":
+//                    root.put(name, 1.23);
+//                    break;
+//                default:
+//                    root.put(name, "value");
+//            }
+//        }
+//
+//        return root.toPrettyString();
+//    }
+
+
+
+//    private static String buildJsonFromParams(String paramsBlock) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ObjectNode root = mapper.createObjectNode();
+//
+//        // Match both 'requires' and 'optional'
+//        Pattern paramPattern = Pattern.compile(
+//                "(requires|optional)\\s+:([\\w_]+),\\s*type:\\s*(\\w+)(?:,\\s*default:\\s*([^,\\n]+))?(?:,\\s*desc:\\s*'([^']*)')?",
+//                Pattern.DOTALL
+//        );
+//
+//        Matcher paramMatcher = paramPattern.matcher(paramsBlock);
+//        while (paramMatcher.find()) {
+//            String paramType = paramMatcher.group(1); // 'requires' or 'optional' — you can use this later if needed
+//            String name = paramMatcher.group(2);
+//            String type = paramMatcher.group(3);
+//            String defaultValue = paramMatcher.group(4); // optional, can be null
+//            // String desc = paramMatcher.group(5); // optional, use if you want descriptions
+//            if(name.equalsIgnoreCase("plan_code") || name.equalsIgnoreCase("marital_status")){
+////                name = "BAKA USER";
+//                System.out.println("ssdsd");
+//            }
+//
+//
+//            switch (type.toLowerCase()) {
+//                case "string":
+//                    root.put(name, defaultValue != null ? defaultValue.replaceAll("\"", "").trim() : "example");
+//                    break;
+//                case "boolean":
+//                    root.put(name, defaultValue != null ? Boolean.parseBoolean(defaultValue.trim()) : true);
+//                    break;
+//                case "integer":
+//                    root.put(name, defaultValue != null ? Integer.parseInt(defaultValue.trim()) : 123);
+//                    break;
+//                case "float":
+//                    root.put(name, defaultValue != null ? Float.parseFloat(defaultValue.trim()) : 1.23f);
+//                    break;
+//                default:
+//                    root.put(name, "value");
+//            }
+//        }
+//
+//        return root.toPrettyString();
+//    }
+
+
+
+//    private static String buildJsonFromParams(String paramsBlock) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ObjectNode root = mapper.createObjectNode();
+//
+//        Matcher paramMatcher = Pattern.compile("requires\\s+:([\\w_]+),\\s*type:\\s*(\\w+)", Pattern.DOTALL).matcher(paramsBlock);
+//        while (paramMatcher.find()) {
+//            String name = paramMatcher.group(1);
+//            String type = paramMatcher.group(2);
+//
+//            switch (type.toLowerCase()) {
+//                case "string":
+//                    root.put(name, "example");
+//                    break;
+//                case "boolean":
+//                    root.put(name, true);
+//                    break;
+//                case "integer":
+//                    root.put(name, 123);
+//                    break;
+//                case "float":
+//                    root.put(name, 1.23);
+//                    break;
+//                default:
+//                    root.put(name, "value");
+//            }
+//        }
+//
+//        return root.toPrettyString();
+//    }
 }

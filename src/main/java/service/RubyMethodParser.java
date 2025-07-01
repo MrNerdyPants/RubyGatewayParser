@@ -28,7 +28,8 @@ public class RubyMethodParser {
         RubyMethodMetadata meta = new RubyMethodMetadata();
 
         // 1. Method name
-        Matcher nameMatcher = Pattern.compile("def\\s+(\\w+)").matcher(defBlock);
+        Matcher nameMatcher = Pattern.compile("def\\s+(?:self\\.)?(\\w+)").matcher(defBlock);
+//                Pattern.compile("def\\s+(\\w+)").matcher(defBlock);
         if (nameMatcher.find()) {
             meta.methodName = nameMatcher.group(1);
         }
@@ -44,6 +45,19 @@ public class RubyMethodParser {
                 }
             }
         }
+
+        queryMatcher = Pattern.compile("params\\s*=\\s*\\{(.*?)\\}", Pattern.DOTALL).matcher(defBlock);
+        if (queryMatcher.find()) {
+            String hashBody = queryMatcher.group(1);
+
+            // Match keys like `MSISDN:`, `FirstName:`, etc.
+            Matcher keyMatcher = Pattern.compile("(\\w+)\\s*:").matcher(hashBody);
+            while (keyMatcher.find()) {
+                meta.queryParams.add(keyMatcher.group(1));
+            }
+        }
+
+
 
         // 3. Router block
 //        Matcher routerMatcher = Pattern.compile("micro_service:\\s*\"([^\"]+)\".*?operation:\\s*\"([^\"]+)\".*?backend_ver:\\s*(.+?)(,|\\n|\\})", Pattern.DOTALL).matcher(defBlock);

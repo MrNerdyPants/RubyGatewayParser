@@ -54,54 +54,6 @@ public class Northbound {
     }
 
 
-    public static List<String> extractDefBlocks(String fileContent) {
-        List<String> defBlocks = new ArrayList<>();
-        Matcher matcher = Pattern.compile("def\\s+\\w+[\\s\\S]*?^\\s*end\\s*$", Pattern.MULTILINE).matcher(fileContent);
-        while (matcher.find()) {
-            defBlocks.add(matcher.group());
-        }
-        return defBlocks;
-    }
-
-    public static List<String> extractDefBlocks2(String fileContent) {
-        List<String> blocks = new ArrayList<>();
-        List<String> currentBlock = new ArrayList<>();
-        boolean inBlock = false;
-        int openDoCount = 0;
-
-        String[] lines = fileContent.split("\n");
-        for (String line : lines) {
-            String trimmed = line.trim();
-
-            if (trimmed.startsWith("desc") && !inBlock) {
-                inBlock = true;
-                currentBlock = new ArrayList<>();
-            }
-
-            if (inBlock) {
-                currentBlock.add(line);
-
-                if (trimmed.matches(".*\\bdo\\b.*")) openDoCount++;
-                if (trimmed.equals("end")) openDoCount--;
-
-                if (openDoCount <= 0 && trimmed.matches("^(get|post|put|delete)\\b.*")) {
-                    // These usually end after `get do` ... `end`
-                    blocks.add(String.join("\n", currentBlock));
-                    inBlock = false;
-                    openDoCount = 0;
-                }
-            }
-        }
-
-        // Add the last block if the file ended before closing
-        if (inBlock && !currentBlock.isEmpty()) {
-            blocks.add(String.join("\n", currentBlock));
-        }
-
-        return blocks;
-    }
-
-
     private static void processFile(Path filePath) {
         System.out.println("\n--- Extracting from: " + filePath + " ---");
 
