@@ -46,12 +46,25 @@ public class RubyMethodParser {
         }
 
         // 3. Router block
-        Matcher routerMatcher = Pattern.compile("micro_service:\\s*\"([^\"]+)\".*?operation:\\s*\"([^\"]+)\".*?backend_ver:\\s*(.+?)(,|\\n|\\})", Pattern.DOTALL).matcher(defBlock);
+//        Matcher routerMatcher = Pattern.compile("micro_service:\\s*\"([^\"]+)\".*?operation:\\s*\"([^\"]+)\".*?backend_ver:\\s*(.+?)(,|\\n|\\})", Pattern.DOTALL).matcher(defBlock);
+        Pattern routerPattern = Pattern.compile(
+                "micro_service:\\s*\"([^\"]+)\".*?" +
+                        "operation:\\s*\"([^\"]*)\".*?" +
+                        "backend_ver:\\s*(?:\"([^\"]+)\"|(\\w+))",
+                Pattern.DOTALL
+        );
+        Matcher routerMatcher = routerPattern.matcher(defBlock);
         if (routerMatcher.find()) {
             meta.microService = routerMatcher.group(1);
             meta.operation = routerMatcher.group(2);
 
-            String backendRaw = routerMatcher.group(3).trim();
+            String backendRaw = "";
+            try{
+                backendRaw = routerMatcher.group(3).trim();
+            }
+            catch (Exception e){
+                backendRaw = routerMatcher.group(4).trim();
+            }
             if (backendRaw.equals("BACKEND_VERSION")) {
                 meta.backendVersion = providedBackendVersion;
             } else {
@@ -62,13 +75,16 @@ public class RubyMethodParser {
         }
 
         // 4. Response parsing method
-        Matcher responseMatcher = Pattern.compile("Virgin::API::Response\\.new\\(.*?\\)\\.([a-zA-Z0-9_]+)").matcher(defBlock);
+//        Matcher responseMatcher = Pattern.compile("Virgin::API::Response\\.new\\(.*?\\)\\.([a-zA-Z0-9_]+)").matcher(defBlock);
+        Matcher responseMatcher = Pattern.compile(
+                "Virgin::API::(?:Response|CommitResponse|ResponseV2)\\.new\\(.*?\\)\\.([a-zA-Z0-9_]+)"
+        ).matcher(defBlock);
         if (responseMatcher.find()) {
             meta.responseUnwrapMethod = responseMatcher.group(1);
         }
 
         String httpMethod = extractHttpMethod(defBlock);
-        meta.httpMethod= httpMethod;
+        meta.httpMethod = httpMethod;
 
 
         return meta;
