@@ -191,7 +191,7 @@ public class CSVCombiner {
     public static void writeCombinedCSV(List<CombinedRecord> records, String outputPath) throws IOException {
         try (PrintWriter pw = new PrintWriter(new FileWriter(outputPath))) {
             // Write header
-            pw.println("northboundVersion,apiName,headers,httpMethod_api,endpoint_api,jsonBody,southboundVersion,southboundMethod," +
+            pw.println("northboundVersion,/apiName,headers,httpMethod_api,endpoint_api,jsonBody,southboundVersion,southboundMethod," +
                     "southBoundVersion_sb,methodName,queryParams,microService,operation,backendVersion," +
                     "endpoint_sb,responseUnwrapMethod,httpMethod_sb");
 

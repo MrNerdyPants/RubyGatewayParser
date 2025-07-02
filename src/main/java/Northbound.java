@@ -1,4 +1,5 @@
 import model.ApiMetadata;
+import service.DescBlockExtractor;
 import service.DescBlockParser;
 import service.GenericCsvMapper;
 
@@ -9,9 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import static service.DescBlockExtractor.extractDescBlocks;
 
 /**
  * Represents the Main class in the RubyTransformation project.
@@ -63,37 +64,39 @@ public class Northbound {
             String fileBaseName = filePath.getFileName().toString();
             fileBaseName = fileBaseName.replace(".rb", "");
 
-            String line;
-            boolean capturing = false;
-            StringBuilder currentBlock = new StringBuilder();
-            List<String> blocks = new ArrayList<>();
+//            String line;
+//            boolean capturing = false;
+//            StringBuilder currentBlock = new StringBuilder();
+//            List<String> blocks = new ArrayList<>();
+//
+//            while ((line = reader.readLine()) != null) {
+//                wholeFileContent.append(line).append("\n");
+//                if (line.trim().startsWith("desc ")) {
+//                    // New desc block begins
+//                    if (capturing && currentBlock.length() > 0) {
+//                        blocks.add(currentBlock.toString());
+//                        currentBlock.setLength(0); // reset
+//                    }
+//                    capturing = true;
+//                }
+//
+//                if (capturing) {
+//                    currentBlock.append(line).append("\n");
+//                }
+//            }
+//
+//            // Add the last block if file ends without a new "desc"
+//            if (capturing && currentBlock.length() > 0) {
+//                blocks.add(currentBlock.toString());
+//            }
 
-            while ((line = reader.readLine()) != null) {
-                wholeFileContent.append(line).append("\n");
-                if (line.trim().startsWith("desc ")) {
-                    // New desc block begins
-                    if (capturing && currentBlock.length() > 0) {
-                        blocks.add(currentBlock.toString());
-                        currentBlock.setLength(0); // reset
-                    }
-                    capturing = true;
-                }
-
-                if (capturing) {
-                    currentBlock.append(line).append("\n");
-                }
-            }
-
-            // Add the last block if file ends without a new "desc"
-            if (capturing && currentBlock.length() > 0) {
-                blocks.add(currentBlock.toString());
-            }
-
+            DescBlockExtractor.DescBlocksContents blocksContents = extractDescBlocks(reader);
+            List<DescBlockExtractor.DescBlock> blocks = blocksContents.getDescBlocks();
 
             // Print blocks (or you can save them somewhere)
             for (int i = 0; i < blocks.size(); i++) {
 
-                ApiMetadata meta = DescBlockParser.parseDescBlock(blocks.get(i), fileBaseName, wholeFileContent.toString());
+                ApiMetadata meta = DescBlockParser.parseDescBlock(blocks.get(i), fileBaseName, blocksContents.getWholeContent());
                 meta.northboundVersion = parentDir;
 
                 apiMetadata.add(meta);
@@ -109,8 +112,6 @@ public class Northbound {
                 System.out.println("\n");
 //                System.out.println("Block #" + (i + 1) + ":\n" + blocks.get(i));
             }
-
-
 
 
         } catch (IOException e) {
